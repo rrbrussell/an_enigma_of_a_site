@@ -13,6 +13,9 @@
 // You should have received a copy of the GNU General Public License along with
 // this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::static_data::ADDITION_DATA_PACKAGE;
+use crate::static_data::SUBTRACTION_DATA_PACKAGE;
+
 /// These are the characters used in the Enigma machine.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord)]
 #[repr(u8)]
@@ -45,49 +48,10 @@ pub enum Characters {
     Z = 26,
 }
 
-// impl Characters {
-//     /// Not sure if this is useful.
-//     fn into_char(&self) -> char {
-//         return (*self).into();
-//     }
-// }
-
 impl std::convert::Into<char> for Characters {
     fn into(self) -> char {
-        match self {
-            Characters::A => 'A',
-            Characters::B => 'B',
-            Characters::C => 'C',
-            Characters::D => 'D',
-            Characters::E => 'E',
-            Characters::F => 'F',
-            Characters::G => 'G',
-            Characters::H => 'H',
-            Characters::I => 'I',
-            Characters::J => 'J',
-            Characters::K => 'K',
-            Characters::L => 'L',
-            Characters::M => 'M',
-            Characters::N => 'N',
-            Characters::O => 'O',
-            Characters::P => 'P',
-            Characters::Q => 'Q',
-            Characters::R => 'R',
-            Characters::S => 'S',
-            Characters::T => 'T',
-            Characters::U => 'U',
-            Characters::V => 'V',
-            Characters::W => 'W',
-            Characters::X => 'X',
-            Characters::Y => 'Y',
-            Characters::Z => 'Z',
-        }
-    }
-}
-
-impl std::convert::Into<u8> for Characters {
-    fn into(self) -> u8 {
-        return self as u8;
+        //! Ruthlessly exploits data type fudging and the ASCII table.
+        return char::from(64 + self as u8);
     }
 }
 
@@ -126,7 +90,10 @@ impl std::convert::TryFrom<char> for Characters {
                 'Z' => return Ok(Characters::Z),
                 _ => unreachable!(
                     "You managed to escape out of is_ascii_alphabetic at line \
-{} in {}", line!(), file!()),
+{} in {}",
+                    line!(),
+                    file!()
+                ),
             }
         } else {
             return Err("Characters can only be made from ASCII alphabetic \
@@ -178,14 +145,24 @@ impl std::fmt::Display for Characters {
 }
 
 impl std::ops::Add for Characters {
-    type Output = Characters;
+    type Output = Self;
 
     /// This is a wrapping add.
-    fn add(self, other: Self) -> Self {
-        let x: u8 = self.into();
-        let y: u8 = other.into();
-        let z: u8 = ((x + y) % 26) + 1;
-        Self::try_from(z).unwrap()
+    fn add(self, other: Self) -> Self::Output {
+        let right: usize = self as usize;
+        let left: usize = other as usize;
+        ADDITION_DATA_PACKAGE[right][left]
+    }
+}
+
+impl std::ops::Sub for Characters {
+    type Output = Self;
+
+    /// This is a wrapping subtract.
+    fn sub(self, other: Self) -> Self::Output {
+        let right: usize = self as usize;
+        let left: usize = other as usize;
+        SUBTRACTION_DATA_PACKAGE[right][left]
     }
 }
 
@@ -195,13 +172,44 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_add() {
-        //todo!();
+    fn test_into_char() {
+        let func_ptr: fn(Characters) -> char = <Characters as Into<char>>::into;
+        let test_data = [
+            (Characters::A, 'A'),
+            (Characters::B, 'B'),
+            (Characters::C, 'C'),
+            (Characters::D, 'D'),
+            (Characters::E, 'E'),
+            (Characters::F, 'F'),
+            (Characters::G, 'G'),
+            (Characters::H, 'H'),
+            (Characters::I, 'I'),
+            (Characters::J, 'J'),
+            (Characters::K, 'K'),
+            (Characters::L, 'L'),
+            (Characters::M, 'M'),
+            (Characters::N, 'N'),
+            (Characters::O, 'O'),
+            (Characters::P, 'P'),
+            (Characters::Q, 'Q'),
+            (Characters::R, 'R'),
+            (Characters::S, 'S'),
+            (Characters::T, 'T'),
+            (Characters::U, 'U'),
+            (Characters::V, 'V'),
+            (Characters::W, 'W'),
+            (Characters::X, 'X'),
+            (Characters::Y, 'Y'),
+            (Characters::Z, 'Z'),
+        ];
+        for (data, expected) in test_data {
+            assert_eq!(func_ptr(data), expected);
+        }
     }
 
     #[test]
     fn test_try_from_u8() {
-        let test_data:[(u8, Result<Characters, &'static str>); 27] = [
+        let test_data: [(u8, Result<Characters, &'static str>); 27] = [
             (1 as u8, Ok(Characters::A)),
             (2 as u8, Ok(Characters::B)),
             (3 as u8, Ok(Characters::C)),
@@ -228,7 +236,11 @@ mod tests {
             (24 as u8, Ok(Characters::X)),
             (25 as u8, Ok(Characters::Y)),
             (26 as u8, Ok(Characters::Z)),
-            (47 as u8, Err("Characters only map to the values from 1 to 26.")),];
+            (
+                47 as u8,
+                Err("Characters only map to the values from 1 to 26."),
+            ),
+        ];
         for (data, wanted) in test_data {
             assert_eq!(Characters::try_from(data), wanted);
         }

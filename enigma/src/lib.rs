@@ -15,5 +15,6 @@
 
 mod characters;
 mod rotors;
+mod static_data;
 
 pub use crate::characters::Characters;
