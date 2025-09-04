@@ -13,7 +13,22 @@
 // You should have received a copy of the GNU General Public License along with
 // this program. If not, see <https://www.gnu.org/licenses/>.
 
-mod characters;
-mod rotors;
+/// This is the list of available Rotors.
+#[derive(Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+enum Rotors {
+    I,
+    II,
+    III,
+    IV,
+    V,
+}
 
-pub use crate::characters::Characters;
+// I("EKMFLGDVZNTOWYHXUSPAIBRCJ", 'Q')
+// II("AJDKSIRUXBLHWTMCQGZNPYFVOE", 'E')
+// III("BDFHJLCPRTXVZNYEIWGAKMUSQO", 'V')
+// IV("ESOVPZJAYQUIRHXLNFTGKDCMWB", 'J')
+// V("VZBRGITYUPSDNHLXZWMJQOFECK", 'Z')
+
+struct Rotor {
+    //    forwardWiringMap:
+}
