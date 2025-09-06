@@ -17,35 +17,21 @@ use crate::static_data::ADDITION_DATA_PACKAGE;
 use crate::static_data::SUBTRACTION_DATA_PACKAGE;
 
 /// These are the characters used in the Enigma machine.
-#[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum Characters {
-    A = 1,
-    B = 2,
-    C = 3,
-    D = 4,
-    E = 5,
-    F = 6,
-    G = 7,
-    H = 8,
-    I = 9,
-    J = 10,
-    K = 11,
-    L = 12,
-    M = 13,
-    N = 14,
-    O = 15,
-    P = 16,
-    Q = 17,
-    R = 18,
-    S = 19,
-    T = 20,
-    U = 21,
-    V = 22,
-    W = 23,
-    X = 24,
-    Y = 25,
-    Z = 26,
+    A = 0,
+    B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
+}
+
+impl Characters {
+    /// Get a interator from this Characters to Characters::Z.
+    pub const fn iter(&self) -> CharactersIter {
+        CharactersIter {
+            current: *self,
+            exhausted: false,
+        }
+    }
 }
 
 impl std::convert::Into<char> for Characters {
@@ -138,13 +124,19 @@ impl std::convert::TryFrom<u8> for Characters {
     }
 }
 
+impl std::fmt::Debug for Characters {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Characters::{self}")
+    }
+}
+
 impl std::fmt::Display for Characters {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", <Characters as Into<char>>::into(*self))
     }
 }
 
-impl std::ops::Add for Characters {
+impl std::ops::Add<Characters> for Characters {
     type Output = Self;
 
     /// This is a wrapping add.
@@ -152,6 +144,18 @@ impl std::ops::Add for Characters {
         let right: usize = self as usize;
         let left: usize = other as usize;
         ADDITION_DATA_PACKAGE[right][left]
+    }
+}
+
+impl std::ops::Add<u8> for Characters {
+    type Output = Self;
+
+    fn add(self, other: u8) -> Self::Output {
+        let mut sum: u8 = self as u8;
+        sum += other;
+        sum %= 26;
+        sum += 1;
+        return Characters::try_from(sum).unwrap();
     }
 }
 
@@ -243,6 +247,128 @@ mod tests {
         ];
         for (data, wanted) in test_data {
             assert_eq!(Characters::try_from(data), wanted);
+        }
+    }
+}
+
+pub struct CharactersIter {
+    current: Characters,
+    exhausted: bool,
+}
+
+impl std::iter::Iterator for CharactersIter {
+    type Item = Characters;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.exhausted {
+            return None;
+        } else {
+            match self.current {
+                Characters::A => {
+                    self.current = Characters::B;
+                    return Some(Characters::A);
+                }
+                Characters::B => {
+                    self.current = Characters::C;
+                    return Some(Characters::B);
+                }
+                Characters::C => {
+                    self.current = Characters::D;
+                    return Some(Characters::C);
+                }
+                Characters::D => {
+                    self.current = Characters::E;
+                    return Some(Characters::D);
+                }
+                Characters::E => {
+                    self.current = Characters::F;
+                    return Some(Characters::E);
+                }
+                Characters::F => {
+                    self.current = Characters::G;
+                    return Some(Characters::F);
+                }
+                Characters::G => {
+                    self.current = Characters::H;
+                    return Some(Characters::G);
+                }
+                Characters::H => {
+                    self.current = Characters::I;
+                    return Some(Characters::H);
+                }
+                Characters::I => {
+                    self.current = Characters::J;
+                    return Some(Characters::I);
+                }
+                Characters::J => {
+                    self.current = Characters::K;
+                    return Some(Characters::J);
+                }
+                Characters::K => {
+                    self.current = Characters::L;
+                    return Some(Characters::K);
+                }
+                Characters::L => {
+                    self.current = Characters::M;
+                    return Some(Characters::L);
+                }
+                Characters::M => {
+                    self.current = Characters::N;
+                    return Some(Characters::M);
+                }
+                Characters::N => {
+                    self.current = Characters::O;
+                    return Some(Characters::N);
+                }
+                Characters::O => {
+                    self.current = Characters::P;
+                    return Some(Characters::O);
+                }
+                Characters::P => {
+                    self.current = Characters::Q;
+                    return Some(Characters::P);
+                }
+                Characters::Q => {
+                    self.current = Characters::R;
+                    return Some(Characters::Q);
+                }
+                Characters::R => {
+                    self.current = Characters::S;
+                    return Some(Characters::R);
+                }
+                Characters::S => {
+                    self.current = Characters::T;
+                    return Some(Characters::S);
+                }
+                Characters::T => {
+                    self.current = Characters::U;
+                    return Some(Characters::T);
+                }
+                Characters::U => {
+                    self.current = Characters::V;
+                    return Some(Characters::U);
+                }
+                Characters::V => {
+                    self.current = Characters::W;
+                    return Some(Characters::V);
+                }
+                Characters::W => {
+                    self.current = Characters::X;
+                    return Some(Characters::W);
+                }
+                Characters::X => {
+                    self.current = Characters::Y;
+                    return Some(Characters::X);
+                }
+                Characters::Y => {
+                    self.current = Characters::Z;
+                    return Some(Characters::Y);
+                }
+                Characters::Z => {
+                    self.exhausted = true;
+                    return Some(Characters::Z);
+                }
+            }
         }
     }
 }
