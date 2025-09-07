@@ -13,9 +13,23 @@
 // You should have received a copy of the GNU General Public License along with
 // this program. If not, see <https://www.gnu.org/licenses/>.
 
-mod characters;
-mod rotors;
-mod static_data;
-mod wiring;
+use crate::Characters;
 
-pub use crate::characters::Characters;
+#[derive(Debug, Eq, PartialEq)]
+pub(crate) struct Wiring {
+    data: [Characters; 26],
+}
+
+impl std::ops::Index<Characters> for Wiring {
+    type Output = Characters;
+
+    fn index(&self, index: Characters) -> &Self::Output {
+        &(self.data[index as usize])
+    }
+}
+
+impl Wiring {
+    pub fn new(data: [Characters; 26]) -> Wiring {
+        Wiring{data}
+    }
+}

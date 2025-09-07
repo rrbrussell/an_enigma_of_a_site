@@ -13,9 +13,6 @@
 // You should have received a copy of the GNU General Public License along with
 // this program. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::static_data::ADDITION_DATA_PACKAGE;
-use crate::static_data::SUBTRACTION_DATA_PACKAGE;
-
 /// These are the characters used in the Enigma machine.
 #[derive(Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
 #[repr(u8)]
@@ -36,8 +33,8 @@ impl Characters {
 
 impl std::convert::Into<char> for Characters {
     fn into(self) -> char {
-        //! Ruthlessly exploits data type fudging and the ASCII table.
-        return char::from(64 + self as u8);
+        // Ruthlessly exploits data type fudging and the ASCII table.
+        return char::from(65 + self as u8);
     }
 }
 
@@ -47,40 +44,7 @@ impl std::convert::TryFrom<char> for Characters {
     fn try_from(value: char) -> Result<Self, Self::Error> {
         if value.is_ascii_alphabetic() {
             let value: char = value.to_ascii_uppercase();
-            match value {
-                'A' => return Ok(Characters::A),
-                'B' => return Ok(Characters::B),
-                'C' => return Ok(Characters::C),
-                'D' => return Ok(Characters::D),
-                'E' => return Ok(Characters::E),
-                'F' => return Ok(Characters::F),
-                'G' => return Ok(Characters::G),
-                'H' => return Ok(Characters::H),
-                'I' => return Ok(Characters::I),
-                'J' => return Ok(Characters::J),
-                'K' => return Ok(Characters::K),
-                'L' => return Ok(Characters::L),
-                'M' => return Ok(Characters::M),
-                'N' => return Ok(Characters::N),
-                'O' => return Ok(Characters::O),
-                'P' => return Ok(Characters::P),
-                'Q' => return Ok(Characters::Q),
-                'R' => return Ok(Characters::R),
-                'S' => return Ok(Characters::S),
-                'T' => return Ok(Characters::T),
-                'U' => return Ok(Characters::U),
-                'V' => return Ok(Characters::V),
-                'W' => return Ok(Characters::W),
-                'X' => return Ok(Characters::X),
-                'Y' => return Ok(Characters::Y),
-                'Z' => return Ok(Characters::Z),
-                _ => unreachable!(
-                    "You managed to escape out of is_ascii_alphabetic at line \
-{} in {}",
-                    line!(),
-                    file!()
-                ),
-            }
+            return Characters::try_from(value as u8 - 65);
         } else {
             return Err("Characters can only be made from ASCII alphabetic \
  characters.");
@@ -93,33 +57,33 @@ impl std::convert::TryFrom<u8> for Characters {
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
-            01 => Ok(Self::A),
-            02 => Ok(Self::B),
-            03 => Ok(Self::C),
-            04 => Ok(Self::D),
-            05 => Ok(Self::E),
-            06 => Ok(Self::F),
-            07 => Ok(Self::G),
-            08 => Ok(Self::H),
-            09 => Ok(Self::I),
-            10 => Ok(Self::J),
-            11 => Ok(Self::K),
-            12 => Ok(Self::L),
-            13 => Ok(Self::M),
-            14 => Ok(Self::N),
-            15 => Ok(Self::O),
-            16 => Ok(Self::P),
-            17 => Ok(Self::Q),
-            18 => Ok(Self::R),
-            19 => Ok(Self::S),
-            20 => Ok(Self::T),
-            21 => Ok(Self::U),
-            22 => Ok(Self::V),
-            23 => Ok(Self::W),
-            24 => Ok(Self::X),
-            25 => Ok(Self::Y),
-            26 => Ok(Self::Z),
-            _ => Err("Characters only map to the values from 1 to 26."),
+            00 => Ok(Self::A),
+            01 => Ok(Self::B),
+            02 => Ok(Self::C),
+            03 => Ok(Self::D),
+            04 => Ok(Self::E),
+            05 => Ok(Self::F),
+            06 => Ok(Self::G),
+            07 => Ok(Self::H),
+            08 => Ok(Self::I),
+            09 => Ok(Self::J),
+            10 => Ok(Self::K),
+            11 => Ok(Self::L),
+            12 => Ok(Self::M),
+            13 => Ok(Self::N),
+            14 => Ok(Self::O),
+            15 => Ok(Self::P),
+            16 => Ok(Self::Q),
+            17 => Ok(Self::R),
+            18 => Ok(Self::S),
+            19 => Ok(Self::T),
+            20 => Ok(Self::U),
+            21 => Ok(Self::V),
+            22 => Ok(Self::W),
+            23 => Ok(Self::X),
+            24 => Ok(Self::Y),
+            25 => Ok(Self::Z),
+            _ => Err("Characters only map to the values from 0 to 25."),
         }
     }
 }
@@ -141,32 +105,40 @@ impl std::ops::Add<Characters> for Characters {
 
     /// This is a wrapping add.
     fn add(self, other: Self) -> Self::Output {
-        let right: usize = self as usize;
-        let left: usize = other as usize;
-        ADDITION_DATA_PACKAGE[right][left]
+        return self + other as u8;
     }
 }
 
 impl std::ops::Add<u8> for Characters {
     type Output = Self;
 
+    /// This is a wrapping add.
     fn add(self, other: u8) -> Self::Output {
         let mut sum: u8 = self as u8;
         sum += other;
         sum %= 26;
-        sum += 1;
         return Characters::try_from(sum).unwrap();
     }
 }
 
-impl std::ops::Sub for Characters {
+impl std::ops::Sub<Characters> for Characters {
     type Output = Self;
 
     /// This is a wrapping subtract.
     fn sub(self, other: Self) -> Self::Output {
-        let right: usize = self as usize;
-        let left: usize = other as usize;
-        SUBTRACTION_DATA_PACKAGE[right][left]
+        return self - other as u8;
+    }
+}
+
+impl std::ops::Sub<u8> for Characters {
+    type Output = Self;
+
+    /// This is a wrapping subtract.
+    fn sub(self, other: u8) -> Self::Output {
+        let mut difference: u8 = self as u8 + 52;
+        difference -= other;
+        difference %= 26;
+        return Characters::try_from(difference).unwrap();
     }
 }
 
@@ -214,35 +186,35 @@ mod tests {
     #[test]
     fn test_try_from_u8() {
         let test_data: [(u8, Result<Characters, &'static str>); 27] = [
-            (1 as u8, Ok(Characters::A)),
-            (2 as u8, Ok(Characters::B)),
-            (3 as u8, Ok(Characters::C)),
-            (4 as u8, Ok(Characters::D)),
-            (5 as u8, Ok(Characters::E)),
-            (6 as u8, Ok(Characters::F)),
-            (7 as u8, Ok(Characters::G)),
-            (8 as u8, Ok(Characters::H)),
-            (9 as u8, Ok(Characters::I)),
-            (10 as u8, Ok(Characters::J)),
-            (11 as u8, Ok(Characters::K)),
-            (12 as u8, Ok(Characters::L)),
-            (13 as u8, Ok(Characters::M)),
-            (14 as u8, Ok(Characters::N)),
-            (15 as u8, Ok(Characters::O)),
-            (16 as u8, Ok(Characters::P)),
-            (17 as u8, Ok(Characters::Q)),
-            (18 as u8, Ok(Characters::R)),
-            (19 as u8, Ok(Characters::S)),
-            (20 as u8, Ok(Characters::T)),
-            (21 as u8, Ok(Characters::U)),
-            (22 as u8, Ok(Characters::V)),
-            (23 as u8, Ok(Characters::W)),
-            (24 as u8, Ok(Characters::X)),
-            (25 as u8, Ok(Characters::Y)),
-            (26 as u8, Ok(Characters::Z)),
+            (00 as u8, Ok(Characters::A)),
+            (01 as u8, Ok(Characters::B)),
+            (02 as u8, Ok(Characters::C)),
+            (03 as u8, Ok(Characters::D)),
+            (04 as u8, Ok(Characters::E)),
+            (05 as u8, Ok(Characters::F)),
+            (06 as u8, Ok(Characters::G)),
+            (07 as u8, Ok(Characters::H)),
+            (08 as u8, Ok(Characters::I)),
+            (09 as u8, Ok(Characters::J)),
+            (10 as u8, Ok(Characters::K)),
+            (11 as u8, Ok(Characters::L)),
+            (12 as u8, Ok(Characters::M)),
+            (13 as u8, Ok(Characters::N)),
+            (14 as u8, Ok(Characters::O)),
+            (15 as u8, Ok(Characters::P)),
+            (16 as u8, Ok(Characters::Q)),
+            (17 as u8, Ok(Characters::R)),
+            (18 as u8, Ok(Characters::S)),
+            (19 as u8, Ok(Characters::T)),
+            (20 as u8, Ok(Characters::U)),
+            (21 as u8, Ok(Characters::V)),
+            (22 as u8, Ok(Characters::W)),
+            (23 as u8, Ok(Characters::X)),
+            (24 as u8, Ok(Characters::Y)),
+            (25 as u8, Ok(Characters::Z)),
             (
                 47 as u8,
-                Err("Characters only map to the values from 1 to 26."),
+                Err("Characters only map to the values from 0 to 25."),
             ),
         ];
         for (data, wanted) in test_data {
