@@ -15,7 +15,7 @@
 
 use crate::Characters;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub(crate) struct Wiring {
     data: [Characters; 26],
 }
@@ -30,6 +30,6 @@ impl std::ops::Index<Characters> for Wiring {
 
 impl Wiring {
     pub fn new(data: [Characters; 26]) -> Wiring {
-        Wiring{data}
+        Wiring { data }
     }
 }

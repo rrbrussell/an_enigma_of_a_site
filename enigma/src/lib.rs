@@ -14,8 +14,18 @@
 // this program. If not, see <https://www.gnu.org/licenses/>.
 
 mod characters;
+mod m3machine;
+mod reflectors;
 mod rotors;
 mod static_data;
+mod steckerboard;
 mod wiring;
 
 pub use crate::characters::Characters;
+pub use crate::m3machine::M3Machine;
+pub use crate::reflectors::Reflector;
+pub use crate::reflectors::Reflectors;
+pub use crate::rotors::Rotor;
+pub use crate::rotors::Rotors;
+pub use crate::steckerboard::Pairs;
+pub use crate::steckerboard::SteckerBoard;
