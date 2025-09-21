@@ -14,16 +14,43 @@
 // this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::Characters;
+use crate::Pairs;
 use crate::Reflector;
 use crate::Reflectors;
 use crate::Rotor;
 use crate::Rotors;
 use crate::SteckerBoard;
 
+#[derive(Debug)]
 pub struct Indicators {
     slow: Characters,
     medium: Characters,
-    fast: Characters
+    fast: Characters,
+}
+
+impl std::str::FromStr for Indicators {
+    type Err = &'static str;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s.len() != 3 { return Err("Must be three characters long."); }
+        if !s.is_ascii() {
+            return Err("The argument isn't entirely ASCII characters.");
+        }
+        let mut temp = s.chars();
+        let slow = temp.next().unwrap();
+        if !slow.is_alphabetic() { return Err("Must be an alphabetic \
+character.");}
+        let slow = Characters::try_from(slow).unwrap();
+        let medium = temp.next().unwrap();
+        if !medium.is_alphabetic() { return Err("Must be an alphabetic \
+character.");}
+        let medium = Characters::try_from(medium).unwrap();
+        let fast = temp.next().unwrap();
+        if !fast.is_alphabetic() {return Err("Must be an alphabetic \
+character.");}
+        let fast = Characters::try_from(fast).unwrap();
+        Ok(Indicators{slow, medium, fast})
+    }
 }
 
 impl std::ops::Index<RotorPosition> for Indicators {
@@ -52,10 +79,18 @@ pub struct M3Machine {
 }
 
 impl M3Machine {
+    /// Configure a rotor for use inside the machine.
+    /// The ringstellung is the letter from the Rotor's contact ring that
+    /// is paired with "A" or "01" on the Rotor's indicator ring.
+    pub fn configure_rotor(chosen: Rotors, ringstellung: Characters) -> Rotor {
+        Rotor::new(chosen, ringstellung)
+    }
+
     /// Perform the encipherment of a single character.
+    ///
     /// The encipherment is symmetric meaning deciphering is the same as
     /// encipherment.
-    fn encipher(&mut self, input: Characters) -> Characters {
+    pub fn encipher(&mut self, input: Characters) -> Characters {
         self.step_rotors();
         let mut output: Characters;
         output = self.stecker_board.encipher(input);
@@ -80,7 +115,7 @@ impl M3Machine {
 
     /// Get all the indicators.
     pub fn indicators(&self) -> Indicators {
-        Indicators{
+        Indicators {
             slow: self.slow_rotor.indicator(),
             medium: self.medium_rotor.indicator(),
             fast: self.fast_rotor.indicator(),
@@ -92,10 +127,10 @@ impl M3Machine {
         match pos {
             RotorPosition::Fast => {
                 self.step_medium_rotor = self.fast_rotor.set_indicator(to);
-            },
+            }
             RotorPosition::Medium => {
                 self.step_slow_rotor = self.medium_rotor.set_indicator(to);
-            },
+            }
             RotorPosition::Slow => {
                 // The M3Machine doesn't have a steppable reflector so we can
                 // ignore the stepping transfer point for the slowest rotor.
@@ -106,11 +141,15 @@ impl M3Machine {
 
     /// Set all indicator positions.
     pub fn set_indicators(&mut self, indicators: Indicators) {
-        self.step_medium_rotor =
-        self.fast_rotor.set_indicator(indicators[RotorPosition::Fast]);
-        self.step_slow_rotor =
-        self.medium_rotor.set_indicator(indicators[RotorPosition::Medium]);
-        _ = self.slow_rotor.set_indicator(indicators[RotorPosition::Slow]);
+        self.step_medium_rotor = self
+            .fast_rotor
+            .set_indicator(indicators[RotorPosition::Fast]);
+        self.step_slow_rotor = self
+            .medium_rotor
+            .set_indicator(indicators[RotorPosition::Medium]);
+        _ = self
+            .slow_rotor
+            .set_indicator(indicators[RotorPosition::Slow]);
     }
 
     /// Step the fast rotor by one position forward.
@@ -132,8 +171,13 @@ impl M3Machine {
 
     /// You start by unpacking the M3Machine and then configuring it.
     pub const fn unpack() -> M3MachineUnprepared {
-        return M3MachineUnprepared { fast_rotor: None, medium_rotor: None,
-            slow_rotor: None, reflector: None, stecker_board: None };
+        return M3MachineUnprepared {
+            fast_rotor: None,
+            medium_rotor: None,
+            slow_rotor: None,
+            reflector: None,
+            stecker_board: None,
+        };
     }
 }
 
@@ -149,22 +193,26 @@ pub struct M3MachineUnprepared {
 }
 
 impl M3MachineUnprepared {
-
-    /// Configure a rotor for use inside the machine.
-    /// The ringstellung is the letter from the Rotor's contact ring that
-    /// is paired with "A" or "01" on the Rotor's indicator ring.
-    pub fn configure_rotor(chosen: Rotors, ringstellung: Characters) -> Rotor {
-        Rotor::new(chosen, ringstellung)
-    }
-    
+    /// If setup is not complete then you will will get None.
+    ///
+    /// The indicators still need to be set appropriately.
     pub fn complete_setup(self) -> Option<M3Machine> {
-        match (self.fast_rotor, self.medium_rotor, self.slow_rotor,
-        self.reflector, self.stecker_board) {
+        match (
+            self.fast_rotor,
+            self.medium_rotor,
+            self.slow_rotor,
+            self.reflector,
+            self.stecker_board,
+        ) {
             (Some(fr), Some(mr), Some(sr), Some(r), Some(sb)) => {
                 return Some(M3Machine {
-                    fast_rotor: fr, medium_rotor: mr, slow_rotor: sr, reflector:
-                    r, stecker_board: sb, step_slow_rotor: false,
-                    step_medium_rotor: false
+                    fast_rotor: fr,
+                    medium_rotor: mr,
+                    slow_rotor: sr,
+                    reflector: r,
+                    stecker_board: sb,
+                    step_slow_rotor: false,
+                    step_medium_rotor: false,
                 });
             }
             _ => {
@@ -177,7 +225,7 @@ impl M3MachineUnprepared {
     pub fn load_reflector(&mut self, chosen: Reflectors) {
         self.reflector = Some(Reflector::new(chosen));
     }
-    
+
     /// "Place" the configured Rotor into the machine.
     /// Use `configure_rotor` to prepare a Rotor for loading.
     ///
@@ -189,61 +237,75 @@ impl M3MachineUnprepared {
     /// reconfiguring the existing rotor.
     /// "Placing" a different Rotor in a filled position simply replaces the
     /// existing rotor.
-    pub fn load_rotor(&mut self, position: RotorPosition, rotor: Rotor) -> bool
-    {
+    pub fn load_rotor(
+        &mut self,
+        position: RotorPosition,
+        rotor: Rotor,
+    ) -> bool {
         let rid = rotor.id();
         match position {
             RotorPosition::Fast => {
                 if let Some(medium) = &self.medium_rotor {
-                    if medium.id() == rid { return false;}
+                    if medium.id() == rid {
+                        return false;
                     }
+                }
                 if let Some(slow) = &self.slow_rotor {
-                    if slow.id() == rid {return false;}
+                    if slow.id() == rid {
+                        return false;
                     }
+                }
                 self.fast_rotor = Some(rotor);
                 return true;
             }
             RotorPosition::Medium => {
                 if let Some(fast) = &self.fast_rotor {
-                    if fast.id() == rid {return false;}
+                    if fast.id() == rid {
+                        return false;
                     }
+                }
                 if let Some(slow) = &self.slow_rotor {
-                    if slow.id() == rid {return false;}
+                    if slow.id() == rid {
+                        return false;
+                    }
                 }
                 self.medium_rotor = Some(rotor);
                 return true;
             }
             RotorPosition::Slow => {
                 if let Some(fast) = &self.fast_rotor {
-                    if fast.id() == rid {return false;}
+                    if fast.id() == rid {
+                        return false;
                     }
+                }
                 if let Some(medium) = &self.medium_rotor {
-                    if medium.id() == rid { return false;}
+                    if medium.id() == rid {
+                        return false;
                     }
+                }
                 self.slow_rotor = Some(rotor);
                 return true;
             }
         }
     }
 
-    /// 
+    ///
     pub fn wire_stecker_board(&mut self, sb: SteckerBoard) {
         self.stecker_board = Some(sb);
     }
 }
 
-
 /// Which Rotor position are we trying to insert.
 pub enum RotorPosition {
     Fast,
     Medium,
-    Slow
+    Slow,
 }
-
-
 
 #[cfg(test)]
 mod tests {
+    use std::str::FromStr;
+
     use super::*;
 
     /// The encrypted messages were taken from
@@ -269,21 +331,57 @@ mod tests {
             "EDPUD NRGYS ZRCXN UYTPO MRMBO FKTBZ REZKM LXLVE FGUEY SIOZV EQMIK",
             "UBPMM YLKLT TDEIS MDICA GYKUA CTCDO MOHWX MUUIA UBSTS LRNBZ SZWNR",
             "FXWFY SSXJZ VIJHI DISHP RKLKA YUPAD TXQSP INQMA TLPIF SVKDA SCTAC",
-            "DPBOP VHJK"];
+            "DPBOP VHJK",
+        ];
         let encrypted_message_part_two: [&str; 3] = [
             "SFBWD NJUSE GQOBH KRTAR EEZMW KPPRB XOHDR OEQGB BGTQV PGVKB VVGBI",
             "MHUSZ YDAJQ IROAX SSSNR EHYGG RPISE ZBOVM QIEMM ZCYSG QDGRE RVBIL",
-            "EKXYQ IRGIR QNRDN VRXCY YTNJR"];
+            "EKXYQ IRGIR QNRDN VRXCY YTNJR",
+        ];
         let decrypted_message_part_one: [&str; 4] = [
             "AUFKL XABTE ILUNG XVONX KURTI NOWAX KURTI NOWAX NORDW ESTLX SEBEZ",
             "XSEBE ZXUAF FLIEG ERSTR ASZER IQTUN GXDUB ROWKI XDUBR OWKIX OPOTS",
             "CHKAX OPOTS CHKAX UMXEI NSAQT DREIN ULLXU HRANG ETRET ENXAN GRIFF",
-            "XINFX RGTX"];
+            "XINFX RGTX",
+        ];
         let decrypted_message_part_two: [&str; 3] = [
             "DREIG EHTLA NGSAM ABERS IQERV ORWAE RTSXE INSSI EBENN ULLSE QSXUH",
             "RXROE MXEIN SXINF RGTXD REIXA UFFLI EGERS TRASZ EMITA NFANG XEINS",
-            "SEQSX KMXKM XOSTW XKAME NECXK"];
-        todo!();
+            "SEQSX KMXKM XOSTW XKAME NECXK",
+        ];
+
+        // This is an example for how to use the M3Machine.
+        let mut machine = M3Machine::unpack();
+        machine.load_reflector(reflector);
+        machine.load_rotor(RotorPosition::Slow,
+            M3Machine::configure_rotor(slow_wheel, slow_wheel_ringstellung));
+        machine.load_rotor(RotorPosition::Medium,
+            M3Machine::configure_rotor(medium_wheel,
+                medium_wheel_ringstellung));
+        machine.load_rotor(RotorPosition::Fast,
+            M3Machine::configure_rotor(fast_wheel, fast_wheel_ringstellung));
+        let mut stecker_board: SteckerBoard = SteckerBoard::new();
+        match Pairs::try_new(steckerboard_sequence) {
+            Err(e) => {
+                eprintln!("Opps {e:?} ocurred.");
+                panic!();
+            }
+            Ok(pairs) => {
+                stecker_board.add_jumper_wires(pairs);
+                machine.wire_stecker_board(stecker_board);
+            }
+        }
+        let indicators = Indicators::from_str(message_key_part_one).unwrap();
+        let mut machine = machine.complete_setup().unwrap();
+        machine.set_indicators(indicators);
+        eprintln!("The indicators are {:?}", machine.indicators());
+        let first_ciphertext = Characters::E;
+        let first_plaintext = Characters::A;
+        assert_eq!(machine.encipher(first_ciphertext), first_plaintext);
+        eprintln!("The indicators are {:?}", machine.indicators());
+        let first_ciphertext = Characters::D;
+        let first_plaintext = Characters::U;
+        assert_eq!(machine.encipher(first_ciphertext), first_plaintext);
     }
 
     // The encrypted messages were taken from

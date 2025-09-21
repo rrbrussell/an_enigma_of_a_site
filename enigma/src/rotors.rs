@@ -72,15 +72,12 @@ impl Rotor {
     pub fn indicator(&self) -> Characters {
         return self.indicator;
     }
-    
+
     /// Create a new Rotor.
     /// You can pick a rotor from the Rotors enumeration.
     /// The offset sets which positon A on the Rotor's internal ring maps to
     /// on the Rotor's indicators.
-    pub fn new(
-        which: Rotors,
-        offset: Characters,
-    ) -> Rotor {
+    pub fn new(which: Rotors, offset: Characters) -> Rotor {
         let forward_wiring_map: Wiring;
         let backward_wiring_map: Wiring;
         let transfer_position: Characters;
@@ -136,7 +133,7 @@ impl Rotor {
         self.indicator = to;
         self.will_step()
     }
-    
+
     /// Moves the Rotor on the spindle.
     /// A true return value means that the next Rotor will be stepped as well on
     /// the next stepping.
@@ -160,8 +157,7 @@ mod tests {
 
     #[test]
     fn test_forward_encipherment() {
-        let mut test_rotor =
-            Rotor::new(Rotors::I, Characters::A);
+        let mut test_rotor = Rotor::new(Rotors::I, Characters::A);
         assert_eq!(
             test_rotor.encipher_front_to_back(Characters::A),
             Characters::E
@@ -176,8 +172,7 @@ mod tests {
 
     #[test]
     fn test_backward_encipherment() {
-        let mut test_rotor =
-            Rotor::new(Rotors::I, Characters::A);
+        let mut test_rotor = Rotor::new(Rotors::I, Characters::A);
         assert_eq!(
             test_rotor.encipher_back_to_front(Characters::A),
             Characters::U

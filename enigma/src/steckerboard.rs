@@ -31,7 +31,7 @@ impl SteckerBoard {
         for c in Characters::A.iter() {
             board.insert(c, c);
         }
-        Self{ board }
+        Self { board }
     }
 
     pub fn add_jumper_wires(&mut self, pairs: Pairs) {
@@ -68,16 +68,46 @@ impl Pairs {
         let mut char_set: HashSet<Characters> = HashSet::with_capacity(20);
         let mut pairings: usize = 0;
         let mut data: [Pairing; 10] = [
-            Pairing{from: Characters::A, to: Characters::A},
-            Pairing{from: Characters::A, to: Characters::A},
-            Pairing{from: Characters::A, to: Characters::A},
-            Pairing{from: Characters::A, to: Characters::A},
-            Pairing{from: Characters::A, to: Characters::A},
-            Pairing{from: Characters::A, to: Characters::A},
-            Pairing{from: Characters::A, to: Characters::A},
-            Pairing{from: Characters::A, to: Characters::A},
-            Pairing{from: Characters::A, to: Characters::A},
-            Pairing{from: Characters::A, to: Characters::A},
+            Pairing {
+                from: Characters::A,
+                to: Characters::A,
+            },
+            Pairing {
+                from: Characters::A,
+                to: Characters::A,
+            },
+            Pairing {
+                from: Characters::A,
+                to: Characters::A,
+            },
+            Pairing {
+                from: Characters::A,
+                to: Characters::A,
+            },
+            Pairing {
+                from: Characters::A,
+                to: Characters::A,
+            },
+            Pairing {
+                from: Characters::A,
+                to: Characters::A,
+            },
+            Pairing {
+                from: Characters::A,
+                to: Characters::A,
+            },
+            Pairing {
+                from: Characters::A,
+                to: Characters::A,
+            },
+            Pairing {
+                from: Characters::A,
+                to: Characters::A,
+            },
+            Pairing {
+                from: Characters::A,
+                to: Characters::A,
+            },
         ];
 
         let mut temp_from: Option<Characters> = None;
@@ -86,32 +116,84 @@ impl Pairs {
         for c in input.chars() {
             let temp: Option<Characters>;
             match c {
-                'A' | 'a' => {temp = Some(Characters::A);}
-                'B' | 'b' => {temp = Some(Characters::B);}
-                'C' | 'c' => {temp = Some(Characters::C);}
-                'D' | 'd' => {temp = Some(Characters::D);}
-                'E' | 'e' => {temp = Some(Characters::E);}
-                'F' | 'f' => {temp=Some(Characters::F);}
-                'G' | 'g' => {temp=Some(Characters::G);}
-                'H' | 'h' => {temp=Some(Characters::H);}
-                'I' | 'i' => {temp=Some(Characters::I);}
-                'J' | 'j' => {temp=Some(Characters::J);}
-                'K' | 'k' => {temp=Some(Characters::K);}
-                'L' | 'l' => {temp=Some(Characters::L);}
-                'M' | 'm' => {temp=Some(Characters::M);}
-                'N' | 'n' => {temp=Some(Characters::N);}
-                'O' | 'o' => {temp=Some(Characters::O);}
-                'P' | 'p' => {temp=Some(Characters::P);}
-                'Q' | 'q' => {temp=Some(Characters::Q);}
-                'R' | 'r' => {temp=Some(Characters::R);}
-                'S' | 's' => {temp=Some(Characters::S);}
-                'T' | 't' => {temp=Some(Characters::T);}
-                'U' | 'u' => {temp=Some(Characters::U);}
-                'V' | 'v' => {temp=Some(Characters::V);}
-                'W' | 'w' => {temp=Some(Characters::W);}
-                'X' | 'x' => {temp=Some(Characters::X);}
-                'Y' | 'y' => {temp=Some(Characters::Y);}
-                'Z' | 'z' => {temp=Some(Characters::Z);}
+                'A' | 'a' => {
+                    temp = Some(Characters::A);
+                }
+                'B' | 'b' => {
+                    temp = Some(Characters::B);
+                }
+                'C' | 'c' => {
+                    temp = Some(Characters::C);
+                }
+                'D' | 'd' => {
+                    temp = Some(Characters::D);
+                }
+                'E' | 'e' => {
+                    temp = Some(Characters::E);
+                }
+                'F' | 'f' => {
+                    temp = Some(Characters::F);
+                }
+                'G' | 'g' => {
+                    temp = Some(Characters::G);
+                }
+                'H' | 'h' => {
+                    temp = Some(Characters::H);
+                }
+                'I' | 'i' => {
+                    temp = Some(Characters::I);
+                }
+                'J' | 'j' => {
+                    temp = Some(Characters::J);
+                }
+                'K' | 'k' => {
+                    temp = Some(Characters::K);
+                }
+                'L' | 'l' => {
+                    temp = Some(Characters::L);
+                }
+                'M' | 'm' => {
+                    temp = Some(Characters::M);
+                }
+                'N' | 'n' => {
+                    temp = Some(Characters::N);
+                }
+                'O' | 'o' => {
+                    temp = Some(Characters::O);
+                }
+                'P' | 'p' => {
+                    temp = Some(Characters::P);
+                }
+                'Q' | 'q' => {
+                    temp = Some(Characters::Q);
+                }
+                'R' | 'r' => {
+                    temp = Some(Characters::R);
+                }
+                'S' | 's' => {
+                    temp = Some(Characters::S);
+                }
+                'T' | 't' => {
+                    temp = Some(Characters::T);
+                }
+                'U' | 'u' => {
+                    temp = Some(Characters::U);
+                }
+                'V' | 'v' => {
+                    temp = Some(Characters::V);
+                }
+                'W' | 'w' => {
+                    temp = Some(Characters::W);
+                }
+                'X' | 'x' => {
+                    temp = Some(Characters::X);
+                }
+                'Y' | 'y' => {
+                    temp = Some(Characters::Y);
+                }
+                'Z' | 'z' => {
+                    temp = Some(Characters::Z);
+                }
                 ':' => {
                     temp = None;
                     if temp_to.is_none() || temp_from.is_none() {
@@ -119,11 +201,15 @@ impl Pairs {
 between the last seen ':' and this one.");
                     }
                     if pairings > 9 {
-                        return Err("There are more than ten pairings inside of \
-the list of pairings.");
+                        return Err(
+                            "There are more than ten pairings inside of \
+the list of pairings.",
+                        );
                     }
-                    data[pairings] = Pairing{from: temp_from.unwrap(),
-                        to: temp_to.unwrap()};
+                    data[pairings] = Pairing {
+                        from: temp_from.unwrap(),
+                        to: temp_to.unwrap(),
+                    };
                     pairings += 1;
                     temp_from = None;
                     temp_to = None;
@@ -133,33 +219,38 @@ the list of pairings.");
                     return Err("Invalid character found in a Steckerboard \
 pairing.");
                 }
-            }
+            } // End of the match statement.
 
             if temp.is_some() {
-                if char_set.insert(temp.unwrap()) {
-                    return Err("We cannot reuse a letter that we have already \
-used.");
+                if !char_set.insert(temp.unwrap()) {
+                    return Err(
+                        "We cannot reuse a letter that we have already \
+used.",
+                    );
                 } else {
                     if temp_from.is_none() {
                         temp_from = temp;
-                        break;
+                        continue;
                     }
                     if temp_to.is_none() {
                         temp_to = temp;
-                        break;
+                        continue;
                     }
-                    return Err("There were not exactly two characters between \
-the last seen ':' and this one.");
+                    return Err(
+                        "There were not exactly two characters between \
+the last seen ':' and this one.",
+                    );
                 }
             }
         }
 
         if pairings < 9 {
-            return Err("There are 10 wires for the Steckerboard. You must use \
-all of them.");
+            return Err(
+                "There are 10 wires for the Steckerboard. You must use \
+all of them.",
+            );
         }
 
-        return Ok(Pairs{data});
+        return Ok(Pairs { data });
     }
 }
-
